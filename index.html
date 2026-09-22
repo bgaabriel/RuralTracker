@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rural Tracker · Dashboard de Indicadores</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- Menu lateral (apenas contexto visual — itens não funcionais) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">Rural Tracker</span>
+      </div>
+      <nav class="nav">
+        <a class="nav-item is-active" href="#" aria-current="page">
+          <span class="nav-icon" data-icon="layers"></span> Dashboard
+        </a>
+        <a class="nav-item" href="#" tabindex="-1">
+          <span class="nav-icon" data-icon="leaf"></span> Talhões
+        </a>
+        <a class="nav-item" href="#" tabindex="-1">
+          <span class="nav-icon" data-icon="droplet"></span> Aplicações
+        </a>
+        <a class="nav-item" href="#" tabindex="-1">
+          <span class="nav-icon" data-icon="sprout"></span> Colheitas
+        </a>
+        <a class="nav-item" href="#" tabindex="-1">
+          <span class="nav-icon" data-icon="bug"></span> Pragas
+        </a>
+        <a class="nav-item" href="#" tabindex="-1">
+          <span class="nav-icon" data-icon="building"></span> Relatórios
+        </a>
+      </nav>
+      <p class="sidebar-note">Itens do menu são apenas ilustrativos nesta tela.</p>
+    </aside>
+
+    <div class="main">
+
+      <!-- Cabeçalho -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title">Dashboard de Indicadores</h1>
+          <p class="page-subtitle">Visão consolidada da sua propriedade e talhões</p>
+        </div>
+        <div class="topbar-right">
+          <div class="sync-indicator" title="Os dados do painel exigem conexão ativa com a internet">
+            <span class="dot"></span>
+            <span id="lastUpdated"></span>
+          </div>
+          <div class="user-chip">
+            <span class="user-avatar" id="userAvatar"></span>
+            <div class="user-meta">
+              <span class="user-name" id="userName"></span>
+              <span class="user-role" id="userRole"></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Seletor de contexto -->
+      <div class="context-bar">
+        <div class="context-tabs" id="contextTabs" role="tablist" aria-label="Selecionar propriedade ou talhão"></div>
+      </div>
+
+      <main class="content">
+
+        <!-- KPIs -->
+        <section class="kpi-grid" id="kpiGrid" aria-label="Indicadores principais"></section>
+
+        <div class="grid-2">
+          <!-- Aplicado x Recomendado -->
+          <section class="card" id="comparisonCard">
+            <div class="card-header">
+              <h2>Aplicado vs. Recomendado</h2>
+              <p class="card-subtitle" id="comparisonSubtitle"></p>
+            </div>
+            <div id="comparisonBody"></div>
+            <div class="card-footnote" id="comparisonLegend"></div>
+          </section>
+
+          <!-- Status da safra atual -->
+          <section class="card" id="seasonCard">
+            <div class="card-header">
+              <h2>Safra atual</h2>
+              <p class="card-subtitle" id="seasonSubtitle"></p>
+            </div>
+            <div id="seasonBody"></div>
+          </section>
+        </div>
+
+        <div class="grid-2">
+          <!-- Sugestão de reajuste -->
+          <section class="card" id="adjustmentCard">
+            <div class="card-header">
+              <h2>Sugestão de reajuste de insumos</h2>
+              <p class="card-subtitle">Gerada ao final de cada safra concluída</p>
+            </div>
+            <div id="adjustmentBody"></div>
+          </section>
+
+          <!-- Pragas e doenças -->
+          <section class="card" id="pestCard">
+            <div class="card-header">
+              <h2>Pragas e doenças</h2>
+              <p class="card-subtitle">Ocorrências declaradas recentemente</p>
+            </div>
+            <div id="pestBody"></div>
+            <div class="card-footnote" id="pestFootnote"></div>
+          </section>
+        </div>
+
+        <!-- Alertas -->
+        <section class="card" id="alertsCard">
+          <div class="card-header">
+            <h2>Alertas recentes</h2>
+            <p class="card-subtitle">Aplicações fora da faixa e riscos climáticos</p>
+          </div>
+          <div id="alertsBody"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+<script src="icons.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
