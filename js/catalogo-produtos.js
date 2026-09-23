@@ -1,0 +1,320 @@
+// Gerado a partir de data/produtos_cafe.json (RF-18) — não editar à mão.
+// Para atualizar: node scripts/build-catalog.js
+(function (root) {
+  const CATALOGO_PRODUTOS = {
+    "_meta": {
+      "descricao": "Banco de dados de referência técnica do Rural Tracker — cultura do café. Doses e indicações compiladas a partir de bulas registradas no MAPA/Agrofit e de fontes técnicas (Embrapa, Incaper, Aegro, Rehagro, Agrolink). Preços são valores médios de mercado coletados em pesquisa e servem apenas como referência inicial — devem ser tratados como configuráveis, pois variam por região e época.",
+      "versao": "1.0",
+      "dataCompilacao": "2026-09-22",
+      "aviso": "Este banco de dados é uma base de apoio à decisão. Não substitui a orientação de um Engenheiro Agrônomo nem a leitura da bula do produto efetivamente utilizado (RNF-09)."
+    },
+    "formulasCalculo": {
+      "calagem": {
+        "nome": "Necessidade de Calagem — Método da Saturação por Bases",
+        "descricao": "Método técnico padrão para correção de acidez do solo, usado quando o produtor possui laudo de análise de solo (modo avançado).",
+        "formula": "NC (t/ha) = CTC x (V2 - V1) / 100, corrigido por PRNT e profundidade de incorporação",
+        "variaveis": {
+          "CTC": "Capacidade de troca catiônica do solo a pH 7,0, em cmolc/dm³ (fornecida no laudo de análise de solo).",
+          "V1": "Saturação por bases atual do solo, em % (fornecida no laudo de análise de solo).",
+          "V2": "Saturação por bases desejada para a cultura do café: entre 60% e 70% (padrão adotado: 65%).",
+          "PRNT": "Poder Relativo de Neutralização Total do calcário a ser utilizado, em % (informado na embalagem do produto; padrão de referência: 80%)."
+        },
+        "fatorProfundidade": {
+          "descricao": "Fator de ajuste (p) aplicado sobre o NC bruto, conforme a forma de incorporação do calcário ao solo.",
+          "aplicacaoSuperficialSemIncorporacao": 0.5,
+          "incorporacaoA20cm": 1,
+          "incorporacaoA30cm": 1.5
+        },
+        "formulaCompleta": "NC_corrigido (t/ha) = [CTC x (V2 - V1) / 100] x (100 / PRNT) x fatorProfundidade",
+        "modoAvancado": true,
+        "camposNecessarios": [
+          "ctc",
+          "saturacaoBasesAtual",
+          "prntCalcario",
+          "formaAplicacao"
+        ],
+        "fonte": "Embrapa Café Conilon (Cap. Recomendação de Adubação e Calagem); Incaper; Agrolink — Calagem: Critérios para Recomendação"
+      },
+      "calagemSimplificada": {
+        "nome": "Necessidade de Calagem — Método Simplificado por Textura do Solo",
+        "descricao": "Tabela de referência aproximada para uso quando o produtor NÃO possui laudo de análise de solo (modo padrão/simples). Fornece uma estimativa de dose de manutenção; recomenda-se reavaliação com análise de solo assim que possível.",
+        "modoAvancado": false,
+        "camposNecessarios": [
+          "tipoSolo"
+        ],
+        "tabelaReferencia": [
+          {
+            "tipoSolo": "Arenoso",
+            "percentualArgila": "até 15%",
+            "doseReferenciaTha": 1
+          },
+          {
+            "tipoSolo": "Textura média",
+            "percentualArgila": "15% a 35%",
+            "doseReferenciaTha": 2
+          },
+          {
+            "tipoSolo": "Argiloso",
+            "percentualArgila": "35% a 60%",
+            "doseReferenciaTha": 3
+          },
+          {
+            "tipoSolo": "Muito argiloso",
+            "percentualArgila": "acima de 60%",
+            "doseReferenciaTha": 4
+          }
+        ],
+        "observacao": "Aproximação derivada das faixas de classificação textural usadas em métodos de recomendação de calagem (Embrapa/Ageitec). É uma estimativa de manutenção, não substitui o método de saturação por bases quando o laudo estiver disponível (RN-10). Reaplicação sugerida a cada 3 anos, salvo orientação técnica em contrário.",
+        "fonte": "Embrapa Ageitec — Planejamento da Adubação e Calagem"
+      },
+      "adubacaoProducao": {
+        "nome": "Adubação de Produção (NPK) — Lavoura em Fase Produtiva",
+        "descricao": "Cálculo da demanda de nutrientes com base na produtividade esperada da safra (sacas beneficiadas por hectare).",
+        "formula": "doseNutriente (kg/ha) = produtividadeEsperadaSacasHa x fatorNutriente",
+        "fatoresPorSaca": {
+          "N_kgPorSaca": 6.2,
+          "P_kgPorSaca": 0.6,
+          "K_kgPorSaca": 5.9
+        },
+        "conversao": {
+          "descricao": "Caso a formulação comercial disponível seja expressa em P2O5/K2O em vez de P/K elementar, aplicar os fatores de conversão abaixo.",
+          "P_paraP2O5": 2.29,
+          "K_paraK2O": 1.2
+        },
+        "observacaoIrrigacao": "Para lavouras irrigadas, a literatura recomenda aumentar a dose em até 50%, parcelando em mais aplicações ao longo do ciclo.",
+        "camposNecessarios": [
+          "produtividadeEsperadaSacasHa",
+          "irrigado"
+        ],
+        "fonte": "Aegro — Adubação para Café; Rehagro — Adubo NPK: como calcular a recomendação para cafeeiros"
+      },
+      "adubacaoFormacao": {
+        "nome": "Adubação de Formação — Lavoura em Implantação (mudas)",
+        "descricao": "Esquema de referência para adubação nos primeiros anos após o plantio, antes do início da produção.",
+        "formulacaoReferencia": "15-00-10",
+        "doses": [
+          {
+            "anoAposPlantio": 1,
+            "gramasPorPlanta": 40,
+            "aplicacoesPorAno": "parceladas conforme orientação técnica"
+          },
+          {
+            "anoAposPlantio": 2,
+            "gramasPorPlanta": 80,
+            "aplicacoesPorAno": "parceladas conforme orientação técnica"
+          }
+        ],
+        "camposNecessarios": [
+          "idadeLavouraAnos"
+        ],
+        "fonte": "NA Sala com Gismonti — Adubação do Café (compilação de práticas de campo)"
+      }
+    },
+    "corretivos": [
+      {
+        "id": "COR-01",
+        "nome": "Calcário Dolomítico",
+        "categoria": "Corretivo de solo",
+        "funcao": "Correção da acidez do solo e fornecimento de Cálcio e Magnésio.",
+        "formulaAssociada": [
+          "calagem",
+          "calagemSimplificada"
+        ],
+        "unidadeDose": "t/ha",
+        "precoReferencia": {
+          "valor": 85,
+          "unidade": "R$/tonelada (granel, retirada em produtor)",
+          "faixaObservada": "R$ 80,00 a R$ 90,00/tonelada"
+        },
+        "fonte": "Cotações MFRural (2026)"
+      }
+    ],
+    "fertilizantesNPK": [
+      {
+        "id": "FERT-01",
+        "nome": "Formulação NPK 15-00-10 (adubação de formação)",
+        "categoria": "Fertilizante",
+        "formulaAssociada": [
+          "adubacaoFormacao"
+        ],
+        "unidadeDose": "g/planta",
+        "precoReferencia": {
+          "valor": null,
+          "unidade": "R$/kg",
+          "obs": "Preço não coletado nesta pesquisa; varia conforme formulação e fonte de matéria-prima (ureia, MAP, KCl). Manter como parâmetro configurável (RNF-06 aplicável por extensão)."
+        }
+      },
+      {
+        "id": "FERT-02",
+        "nome": "Fontes de N-P-K para adubação de produção (ureia, MAP/superfosfatos, cloreto de potássio)",
+        "categoria": "Fertilizante",
+        "formulaAssociada": [
+          "adubacaoProducao"
+        ],
+        "unidadeDose": "kg/ha (N, P, K elementares)",
+        "precoReferencia": {
+          "valor": null,
+          "unidade": "USD/tonelada (FOB importação)",
+          "obs": "Mercado internacional muito volátil em 2026 (ureia oscilando entre US$ 395 e US$ 492/t FOB entre dez/2025 e mar/2026; KCl na faixa de US$ 400-405/t). Preço de venda ao produtor final deve ser cadastrado localmente e atualizado periodicamente."
+        },
+        "fonte": "Farmnews — acompanhamento mensal de preços de fertilizantes (COMEX), 2025-2026"
+      }
+    ],
+    "defensivos": [
+      {
+        "id": "FUNG-01",
+        "nome": "Opera",
+        "fabricante": "BASF",
+        "categoria": "Fungicida",
+        "ingredienteAtivo": "Piraclostrobina (133 g/L) + Epoxiconazol (50 g/L)",
+        "alvos": [
+          "Ferrugem (Hemileia vastatrix)",
+          "Cercosporiose / Mancha-de-olho-pardo (Cercospora coffeicola)"
+        ],
+        "dose": {
+          "min": 0.75,
+          "max": 1.5,
+          "unidade": "L/ha"
+        },
+        "volumeCalda": {
+          "min": 30,
+          "max": 50,
+          "unidade": "L/ha"
+        },
+        "maxAplicacoesPorCiclo": 2,
+        "observacaoAplicacao": "Aplicação preventiva recomendada ao surgimento de condições favoráveis à doença; alternar com fungicidas de outro mecanismo de ação para manejo de resistência.",
+        "precoReferencia": {
+          "valor": 183,
+          "unidade": "R$/litro",
+          "faixaObservada": "R$ 178,00 a R$ 190,00/litro"
+        },
+        "fonte": "BASF Agriculture Brasil (bula Opera); Villa Verde Agro / Agroshop (cotações de varejo, 2026)"
+      },
+      {
+        "id": "FUNG-02",
+        "nome": "Tilt",
+        "fabricante": "Syngenta",
+        "categoria": "Fungicida",
+        "ingredienteAtivo": "Propiconazol (250 g/L)",
+        "alvos": [
+          "Ferrugem (Hemileia vastatrix)",
+          "Cercosporiose / Mancha-de-olho-pardo (Cercospora coffeicola) — uso em viveiro de mudas"
+        ],
+        "dose": [
+          {
+            "alvo": "Ferrugem (lavoura em produção)",
+            "valor": 0.75,
+            "unidade": "L/ha",
+            "obs": "Aplicar quando a ferrugem atingir o terço inferior da planta; reaplicar a cada 30 dias; máximo de 3 aplicações."
+          },
+          {
+            "alvo": "Cercosporiose (viveiro de mudas)",
+            "valor": 0.56,
+            "unidade": "L/ha",
+            "volumeCalda": "400 L/ha",
+            "obs": "Iniciar ao observar as primeiras lesões; reaplicar a cada 15 dias conforme evolução da doença."
+          }
+        ],
+        "maxAplicacoesPorCiclo": 3,
+        "precoReferencia": {
+          "valor": null,
+          "unidade": "R$/litro",
+          "obs": "Preço não coletado nesta pesquisa nesta rodada; manter como parâmetro configurável."
+        },
+        "fonte": "Bula TILT (rev. 26/01/2024), registro ADAPAR"
+      },
+      {
+        "id": "HERB-01",
+        "nome": "Glifosato (formulações genéricas 480/620/720 g/L ou g/kg)",
+        "fabricante": "Diversos (genérico registrado por múltiplos titulares)",
+        "categoria": "Herbicida",
+        "ingredienteAtivo": "Glifosato",
+        "alvos": [
+          "Plantas daninhas em geral na entrelinha do cafezal (ex.: buva, capim-amargoso, capim-pé-de-galinha)"
+        ],
+        "dose": {
+          "min": 1.5,
+          "max": 3,
+          "unidade": "L/ha (produto comercial, equivalente a ~1200 g i.a./ha em ensaios de referência)"
+        },
+        "volumeCalda": {
+          "min": 100,
+          "max": 250,
+          "unidade": "L/ha (aplicação terrestre)"
+        },
+        "observacaoAplicacao": "Aplicar em jato dirigido à entrelinha, evitando contato com folhas e ramos verdes do cafeeiro — o glifosato é sistêmico e o contato acidental pode causar fitotoxidez e deixar resíduos nos grãos.",
+        "precoReferencia": {
+          "valor": null,
+          "unidade": "R$/litro",
+          "obs": "Preço muito variável por concentração e marca; manter como parâmetro configurável."
+        },
+        "fonte": "Bulas registradas ADAPAR (Glifosato CHDS 720 WG, Glifosato CCAB 620 SL, Glifosato Nortox WG, Glifosato 720 WG Perterra); BASF — Herbicidas para Café"
+      },
+      {
+        "id": "INSET-01",
+        "nome": "Bordalo Pro (referência de produto à base de inseticida piretroide/similar registrado para bicho-mineiro)",
+        "fabricante": "Registro Agrofit",
+        "categoria": "Inseticida",
+        "ingredienteAtivo": "Consultar bula do produto específico adquirido",
+        "alvos": [
+          "Bicho-mineiro (Leucoptera coffeella)",
+          "Ácaro-vermelho (Oligonychus ilicis)"
+        ],
+        "dose": [
+          {
+            "alvo": "Bicho-mineiro, infestação abaixo de 20%",
+            "valor": 600,
+            "unidade": "mL/ha"
+          },
+          {
+            "alvo": "Bicho-mineiro, infestação igual ou acima de 20%",
+            "valor": 800,
+            "unidade": "mL/ha"
+          },
+          {
+            "alvo": "Ácaro-vermelho",
+            "valor": 800,
+            "unidade": "mL/ha"
+          }
+        ],
+        "volumeCalda": {
+          "valor": 400,
+          "unidade": "L/ha"
+        },
+        "observacaoAplicacao": "Iniciar aplicação ao constatar as primeiras minas ativas (início de ataque); reaplicar somente se necessário, em intervalos de 30 dias.",
+        "precoReferencia": {
+          "valor": null,
+          "unidade": "R$/litro",
+          "obs": "Preço não coletado nesta pesquisa; manter como parâmetro configurável."
+        },
+        "fonte": "Bula Agrofit do produto (25/08/2022), disponibilizada por revenda especializada"
+      },
+      {
+        "id": "INSET-02",
+        "nome": "Nomolt 150",
+        "fabricante": "BASF",
+        "categoria": "Inseticida",
+        "ingredienteAtivo": "Teflubenzurom (150 g/L)",
+        "alvos": [
+          "Bicho-mineiro (Leucoptera coffeella)"
+        ],
+        "classeAgronomica": "Regulador de crescimento de insetos / inibidor da síntese de quitina",
+        "observacaoAplicacao": "Aplicação preventiva, antes dos picos de infestação (abril-maio e agosto-dezembro). ATENÇÃO: há restrição de uso deste produto para a cultura do café em pelo menos um estado (Paraná) segundo comunicado do fabricante — o cadastro do produto no sistema deve permitir sinalizar restrições regionais antes de recomendar a aplicação.",
+        "dose": {
+          "min": null,
+          "max": null,
+          "unidade": "L/ha",
+          "obs": "Dose específica para café não encontrada de forma conclusiva nesta pesquisa; cadastrar a partir da bula vigente no momento da implementação."
+        },
+        "precoReferencia": {
+          "valor": null,
+          "unidade": "R$/litro",
+          "obs": "Preço não coletado nesta pesquisa."
+        },
+        "fonte": "Bula Nomolt 150 (ADAPAR, rev. 20, 27/01/2026); Agrolink; Revista Cultivar (restrição estadual)"
+      }
+    ]
+  };
+  if (typeof module !== "undefined" && module.exports) module.exports = CATALOGO_PRODUTOS;
+  else root.CATALOGO_PRODUTOS = CATALOGO_PRODUTOS;
+})(typeof window !== "undefined" ? window : globalThis);
